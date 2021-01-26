@@ -51,6 +51,7 @@ type core struct {
 	committed  bool
 	name       atomic.Value
 	id         atomic.Value
+	observers  map[string]data.Observer
 }
 
 func nullCore() *core {
@@ -513,7 +514,7 @@ func (c *core) Reload(task concurrency.Task) (xerr fail.Error) {
 	defer c.SafeUnlock(task)
 
 	if c.loaded && !c.committed {
-		return fail.InconsistentError("altered and not committed")
+		return fail.InconsistentError("cannot reload a not committed data")
 	}
 
 	if task.Aborted() {
@@ -791,4 +792,44 @@ func (c core) Dispose() {
 // satisfies interface data.Cacheable
 func (c core) Discard() {
 
+}
+
+// AddObserver ...
+func (c *core) AddObserver(task concurrency.Task, o data.Observer) fail.Error {
+	if o == nil {
+		return fail.InvalidParameterError("o", "cannot be nil")
+	}
+
+	c.Lock(task)
+	defer c.Unlock(task)
+
+	if _, ok := c.observers[o.GetID()]; ok {
+		return fail.DuplicateError("there is already an Observer identified by '%s'", o.GetID())
+	}
+	c.observers[o.GetID()] = o
+	return nil
+}
+
+// NotifyObservers ...
+func (c *core) NotifyObservers(task concurrency.Task) fail.Error {
+	c.RLock(task)
+	defer c.RUnlock(task)
+
+	for _, v := range c.observers {
+		v.SignalChange(c.GetID())
+	}
+	return nil
+}
+
+// RemoveObserver ...
+func (c *core) RemoveObserver(task concurrency.Task, id string) fail.Error {
+	if id == "" {
+		return fail.InvalidParameterError("id", "cannot be empty string")
+	}
+
+	c.Lock(task)
+	defer c.Unlock(task)
+
+	delete(c.observers, id)
+	return nil
 }
