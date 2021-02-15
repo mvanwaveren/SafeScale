@@ -180,9 +180,8 @@ var errorFuncMap = map[string]func(string) fail.Error{
 
 // reduceOpenstackError ...
 func reduceOpenstackError(errorName string, in []byte) (xerr fail.Error) {
-	// FIXME: check if json.Unmarshal() may panic; if not theses 2 defers are superfluous
 	defer func() {
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *fail.ErrRuntimePanic:
 			xerr = fail.InvalidRequestError(string(in))
 		}
@@ -208,7 +207,8 @@ func reduceOpenstackError(errorName string, in []byte) (xerr fail.Error) {
 				if m, ok = lvl1["message"].(string); ok {
 					msg = m
 					// This switch exists only to return another kind of fail.Error if the errorName does not comply with the real Neutron error (not seen yet)
-					switch t {
+					switch t { // nolint
+					// FIXME: What about the fail.ErrDuplicate ?
 					case "SecurityGroupRuleExists": // return a *fail.ErrDuplicate
 					}
 				}

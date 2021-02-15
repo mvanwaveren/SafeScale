@@ -406,7 +406,7 @@ func (s Stack) CreateSubnet(req abstract.SubnetRequest) (newNet *abstract.Subnet
 			subnet, innerErr = subnets.Create(s.NetworkClient, opts).Extract()
 			return innerErr
 			// if innerErr != nil {
-			// 	switch innerErr.(type) { // nolint
+			// 	switch innerErr.(type) { //nolint
 			// 	case *fail.ErrInvalidRequest:
 			// 		neutronError, innerXErr := ParseNeutronError(innerErr.Error())
 			// 		if innerXErr != nil {
@@ -550,7 +550,7 @@ func (s Stack) InspectSubnetByName(networkRef, name string) (subnet *abstract.Su
 	if networkRef != "" {
 		an, xerr = s.InspectNetwork(networkRef)
 		if xerr != nil {
-			switch xerr.(type) {
+			switch xerr.(type) { //nolint
 			case *fail.ErrNotFound:
 				an, xerr = s.InspectNetworkByName(networkRef)
 			}

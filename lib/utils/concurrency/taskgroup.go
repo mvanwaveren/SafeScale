@@ -58,17 +58,17 @@ type taskGroup struct {
 }
 
 // NewTaskGroup ...
-func NewTaskGroup(parentTask Task) (*taskGroup, fail.Error) { // nolint
+func NewTaskGroup(parentTask Task) (*taskGroup, fail.Error) { //nolint
 	return newTaskGroup(context.TODO(), parentTask)
 }
 
 // NewTaskGroupWithParent ...
-func NewTaskGroupWithParent(parentTask Task) (*taskGroup, fail.Error) { // nolint
+func NewTaskGroupWithParent(parentTask Task) (*taskGroup, fail.Error) { //nolint
 	return newTaskGroup(context.TODO(), parentTask)
 }
 
 // NewTaskGroupWithContext ...
-func NewTaskGroupWithContext(ctx context.Context, parentTask Task) (*taskGroup, fail.Error) { // nolint
+func NewTaskGroupWithContext(ctx context.Context, parentTask Task) (*taskGroup, fail.Error) { //nolint
 	return newTaskGroup(ctx, parentTask)
 }
 
@@ -428,10 +428,8 @@ func (tg *taskGroup) WaitGroupFor(duration time.Duration) (bool, map[string]Task
 		}
 	}
 
-	select {
-	case <-c:
-		return true, results, err
-	}
+	<-c
+	return true, results, err
 }
 
 // Abort aborts the task execution

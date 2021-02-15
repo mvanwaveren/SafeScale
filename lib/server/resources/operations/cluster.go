@@ -344,7 +344,7 @@ func (c *cluster) updateNetworkPropertyIfNeeded(task concurrency.Task) fail.Erro
 		return nil
 	})
 	if xerr != nil {
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *fail.ErrAlteredNothing:
 			xerr = nil
 		}
@@ -788,7 +788,7 @@ func (c *cluster) determineSizingRequirements(task concurrency.Task, req abstrac
 	nodesDef := complementSizingRequirements(&req.NodesDef, *nodesDefault)
 	nodesDef.Image = imageID
 
-	if nodesDef.Equals(*gatewaysDef) {
+	if nodesDef.Equals(*gatewaysDef) { //nolint
 		nodesDef.Template = gatewaysDef.Template
 	} else if nodesDef.Equals(*mastersDef) {
 		nodesDef.Template = mastersDef.Template
@@ -1313,7 +1313,7 @@ func (c *cluster) Serialize(task concurrency.Task) ([]byte, fail.Error) {
 	c.SafeRLock(task)
 	defer c.SafeRUnlock(task)
 
-	r, err := json.Marshal(c) // nolint
+	r, err := json.Marshal(c) //nolint
 	return r, fail.ToError(err)
 }
 
@@ -1334,7 +1334,7 @@ func (c *cluster) Deserialize(task concurrency.Task, buf []byte) (xerr fail.Erro
 	c.SafeLock(task)
 	defer c.SafeUnlock(task)
 
-	err := json.Unmarshal(buf, c) // nolint
+	err := json.Unmarshal(buf, c) //nolint
 	return fail.ToError(err)
 }
 

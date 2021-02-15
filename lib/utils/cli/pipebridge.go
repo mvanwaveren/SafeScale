@@ -229,7 +229,7 @@ func taskRead(t concurrency.Task, p concurrency.TaskParameters) (_ concurrency.T
 		if err == io.EOF {
 			err = nil
 		} else {
-			switch err.(type) {
+			switch err.(type) { //nolint
 			// case fail.ErrAborted, *os.PathError:
 			case *os.PathError:
 				err = nil

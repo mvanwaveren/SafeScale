@@ -318,12 +318,12 @@ func buildTunnel(scfg *SSHConfig) (*SSHTunnel, fail.Error) {
 
 // SSHCommand defines a SSH command
 type SSHCommand struct {
-	hostname string
-	runCmdString  string
+	hostname     string
+	runCmdString string
 	// pingCmdString string
-	cmd           *exec.Cmd
-	tunnels       []*SSHTunnel
-	keyFile       *os.File
+	cmd     *exec.Cmd
+	tunnels []*SSHTunnel
+	keyFile *os.File
 }
 
 func (scmd *SSHCommand) closeTunnels() (xerr fail.Error) {
@@ -531,13 +531,13 @@ func (scmd *SSHCommand) RunWithTimeout(task concurrency.Task, outs outputs.Enum,
 		return -1, "", "", xerr
 	}
 
-	if _, xerr = subtask.StartWithTimeout(scmd.taskExecute, taskExecuteParameters{/*stdout: stdoutPipe, stderr: stderrPipe, */ collectOutputs: outs != outputs.DISPLAY}, timeout); xerr != nil {
+	if _, xerr = subtask.StartWithTimeout(scmd.taskExecute, taskExecuteParameters{ /*stdout: stdoutPipe, stderr: stderrPipe, */ collectOutputs: outs != outputs.DISPLAY}, timeout); xerr != nil {
 		return -1, "", "", xerr
 	}
 
 	r, xerr := subtask.Wait()
 	if xerr != nil {
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *fail.ErrTimeout:
 			xerr = fail.Wrap(xerr.Cause(), "reached timeout of %s", temporal.FormatDuration(timeout))
 		}
@@ -649,11 +649,8 @@ func (scmd *SSHCommand) taskExecute(task concurrency.Task, p concurrency.TaskPar
 		if params.collectOutputs {
 			result["stdout"] = string(msgOut)
 			result["stderr"] = string(msgErr)
-		} else {
-			if pbcErr = pipeBridgeCtrl.Wait(); pbcErr != nil {
-				logrus.Error(pbcErr.Error())
-			}
-
+		} else if pbcErr = pipeBridgeCtrl.Wait(); pbcErr != nil {
+			logrus.Error(pbcErr.Error())
 		}
 	} else {
 		xerr = fail.ExecutionError(runErr)
@@ -736,7 +733,7 @@ func createConsecutiveTunnels(sc *SSHConfig, tunnels *[]*SSHTunnel) (*SSHTunnel,
 				time.Minute,
 			)
 			if xerr != nil {
-				switch xerr.(type) {
+				switch xerr.(type) { //nolint
 				case *retry.ErrTimeout:
 					xerr = fail.ToError(xerr.Cause())
 				}
@@ -850,10 +847,10 @@ func (sconf *SSHConfig) newCommand(task concurrency.Task, cmdString string, with
 
 	// cmd := exec.NewCommandWithContext(ctx, "bash", "-c", sshCmdString)
 	sshCommand := SSHCommand{
-		hostname: sconf.Hostname,
-		runCmdString:  sshCmdString,
-		tunnels: tunnels,
-		keyFile: keyFile,
+		hostname:     sconf.Hostname,
+		runCmdString: sshCmdString,
+		tunnels:      tunnels,
+		keyFile:      keyFile,
 	}
 	return &sshCommand, nil
 }
@@ -937,7 +934,6 @@ func (sconf *SSHConfig) CopyWithTimeout(
 	return sconf.copy(task, remotePath, localPath, isUpload, timeout)
 }
 
-
 // copy copies a file/directory from/to local to/from remote, and fails after 'timeout' (if timeout > 0)
 func (sconf *SSHConfig) copy(
 	task concurrency.Task,
@@ -990,10 +986,10 @@ func (sconf *SSHConfig) copy(
 
 	// cmd := exec.NewCommand("bash", "-c", sshCmdString)
 	sshCommand := SSHCommand{
-		hostname:      sconf.Hostname,
-		runCmdString:  sshCmdString,
-		tunnels:       tunnels,
-		keyFile:       identityfile,
+		hostname:     sconf.Hostname,
+		runCmdString: sshCmdString,
+		tunnels:      tunnels,
+		keyFile:      identityfile,
 	}
 
 	return sshCommand.RunWithTimeout(task, outputs.COLLECT, timeout)

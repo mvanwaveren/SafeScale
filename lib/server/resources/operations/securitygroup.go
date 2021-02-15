@@ -230,7 +230,7 @@ func (sg *securityGroup) Create(task concurrency.Task, networkID, name, descript
 		// case *fail.ErrNotFound:
 		// 	// not found, good, continue
 		// default:
-			return fail.Wrap(xerr, "failed to check if Security Group '%s' already exists", name)
+		return fail.Wrap(xerr, "failed to check if Security Group '%s' already exists", name)
 		// }
 	}
 	if found {
@@ -430,7 +430,7 @@ func (sg *securityGroup) delete(task concurrency.Task, force bool) fail.Error {
 		)
 	})
 	if xerr != nil {
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *retry.ErrStopRetry:
 			xerr = fail.ToError(xerr.Cause())
 		}

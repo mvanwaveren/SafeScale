@@ -74,7 +74,6 @@ func ValidateHostParameter(hostParam HostParameter) (ahf *abstract.HostFull, hos
 	return ahf, hostLabel, nil
 }
 
-
 // ProvideCredentialsIfNeeded ...
 func ProvideCredentialsIfNeeded(request *abstract.HostRequest) (xerr fail.Error) {
 	if request == nil {

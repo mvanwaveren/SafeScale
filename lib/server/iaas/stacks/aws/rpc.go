@@ -742,7 +742,7 @@ func (s stack) rpcAuthorizeSecurityGroupEgress(id *string, egress []*ec2.IpPermi
 	)
 }
 
-func (s stack) rpcDisassociateAddress(id *string) fail.Error { // nolint
+func (s stack) rpcDisassociateAddress(id *string) fail.Error { //nolint
 	if xerr := validateAWSString(id, "id", true); xerr != nil {
 		return xerr
 	}
@@ -1210,7 +1210,7 @@ func (s stack) rpcDescribeInstanceTypes(ids []*string) ([]*ec2.InstanceTypeInfo,
 	} else {
 		request.Filters = []*ec2.Filter{
 			{
-				Name: aws.String("processor-info.supported-architecture"),
+				Name:   aws.String("processor-info.supported-architecture"),
 				Values: []*string{aws.String("x86_64")},
 			},
 		}
@@ -1239,7 +1239,7 @@ func (s stack) rpcDescribeInstanceTypes(ids []*string) ([]*ec2.InstanceTypeInfo,
 		for _, v := range resp.InstanceTypes {
 			it := strings.ToLower(aws.StringValue(v.InstanceType))
 			// exclude special types like Inf* (optimized for inference) or Mac* (macOS) or f1.*
-			if strings.HasPrefix(it, "inf1.") || strings.HasPrefix(it, "mac1.")  || strings.HasPrefix(it, "f1.") {
+			if strings.HasPrefix(it, "inf1.") || strings.HasPrefix(it, "mac1.") || strings.HasPrefix(it, "f1.") {
 				continue
 			}
 			out = append(out, v)
@@ -1585,7 +1585,7 @@ func (s stack) rpcStopInstances(ids []*string, force *bool) fail.Error {
 	)
 }
 
-func (s stack) rpcDescribeNetworkInterfacesOfVm(id *string) ([]*ec2.NetworkInterface, fail.Error) {
+func (s stack) rpcDescribeNetworkInterfacesOfVM(id *string) ([]*ec2.NetworkInterface, fail.Error) {
 	var emptySlice []*ec2.NetworkInterface
 	request := ec2.DescribeNetworkInterfacesInput{
 		Filters: []*ec2.Filter{

@@ -72,6 +72,14 @@ func convertErrorToTunnelError(inErr error) (err error) {
 		}
 	}
 
+	if isConnectionResetByPeer(inErr) {
+		return tunnelError{
+			error:       nil,
+			isTimeout:   false,
+			isTemporary: true,
+		}
+	}
+
 	if isErrorAddressAlreadyInUse(inErr) {
 		return tunnelError{
 			error:       inErr,
@@ -80,7 +88,23 @@ func convertErrorToTunnelError(inErr error) (err error) {
 		}
 	}
 
-	if isNativeSshLibError(inErr) {
+	if isConnectionRefused(inErr) || isConnectionRefusedError(inErr) {
+		return tunnelError{
+			error:       inErr,
+			isTimeout:   false,
+			isTemporary: true,
+		}
+	}
+
+	if isNativeSSHLibError(inErr) {
+		return tunnelError{
+			error:       inErr,
+			isTimeout:   false,
+			isTemporary: false,
+		}
+	}
+
+	if isHostNotFoundError(inErr) {
 		return tunnelError{
 			error:       inErr,
 			isTimeout:   false,
@@ -106,7 +130,7 @@ func isHostNotFoundError(err error) bool {
 
 	err = lastUnwrap(err)
 
-	if !isNativeSshLibError(err) {
+	if !isNativeSSHLibError(err) {
 		return false
 	}
 
@@ -131,7 +155,7 @@ func isConnectionRefusedError(err error) bool {
 
 	err = lastUnwrap(err)
 
-	if !isNativeSshLibError(err) {
+	if !isNativeSSHLibError(err) {
 		return false
 	}
 
@@ -149,7 +173,7 @@ func isConnectionRefusedError(err error) bool {
 	return false
 }
 
-func isNativeSshLibError(err error) bool {
+func isNativeSSHLibError(err error) bool {
 	if err == nil {
 		return false
 	}

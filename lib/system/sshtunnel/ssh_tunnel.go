@@ -27,7 +27,6 @@ import (
 
 	"github.com/sanity-io/litter"
 	"github.com/satori/go.uuid"
-	_ "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -150,7 +149,7 @@ func (tunnel *SSHTunnel) netListenWithTimeout(network, address string, timeout t
 			resLis: theCli,
 			resErr: theErr,
 		}
-		return
+		return //nolint
 	}()
 
 	if timeout != 0 {
@@ -166,10 +165,8 @@ func (tunnel *SSHTunnel) netListenWithTimeout(network, address string, timeout t
 		}
 	}
 
-	select {
-	case res := <-resChan:
-		return res.resLis, res.resErr
-	}
+	res := <-resChan
+	return res.resLis, res.resErr
 }
 
 func (tunnel *SSHTunnel) Ready() <-chan bool {
@@ -221,7 +218,7 @@ func (tunnel *SSHTunnel) Start() (err error) {
 				defer close(errCh)
 				errCh <- cwErr
 			}
-			return
+			return //nolint
 		}()
 
 		tunnel.logf("listening for new ssh connections...")
@@ -264,13 +261,12 @@ func (tunnel *SSHTunnel) Start() (err error) {
 					tunnel.errorf("closing tunnel due to failure forwarding tunnel: %s", litter.Sdump(quittingErr))
 					tunnel.Close()
 				}
-				return
+				return //nolint
 			}()
 		}
 	}
 
-	var total int
-	total = len(tunnel.conns) + len(tunnel.serverConns) + 1
+	total := len(tunnel.conns) + len(tunnel.serverConns) + 1
 	for i, conn := range tunnel.conns {
 		tunnel.logf("[%d/%d] closing the netConn", i+1, total)
 		err := conn.Close()
@@ -328,7 +324,7 @@ func TunnelOptionWithDefaultKeepAlive(keepAlive time.Duration) Option {
 	return func(tunnel *SSHTunnel) error {
 		tunnel.withKeepAlive = true
 
-		kal := NewDefaultKeepAliveCfg()
+		kal := newDefaultKeepAliveCfg()
 		tunnel.timeKeepAliveRead = time.Duration(kal.tcpKeepaliveTime) * time.Second
 		tunnel.timeKeepAliveWrite = time.Duration(kal.tcpKeepaliveTime) * time.Second
 		return nil
@@ -364,7 +360,7 @@ func (tunnel *SSHTunnel) dialSSHWithTimeout(
 			resCli: theCli,
 			resErr: theErr,
 		}
-		return
+		return //nolint
 	}()
 
 	if timeout != 0 {
@@ -380,10 +376,8 @@ func (tunnel *SSHTunnel) dialSSHWithTimeout(
 		}
 	}
 
-	select {
-	case res := <-resChan:
-		return res.resCli, res.resErr
-	}
+	res := <-resChan
+	return res.resCli, res.resErr
 }
 
 func (tunnel *SSHTunnel) dialSSHConnectionWithTimeout(
@@ -418,7 +412,7 @@ func (tunnel *SSHTunnel) dialSSHConnectionWithTimeout(
 			resConn: theConn,
 			resErr:  theErr,
 		}
-		return
+		return //nolint
 	}()
 
 	if timeout != 0 {
@@ -436,11 +430,9 @@ func (tunnel *SSHTunnel) dialSSHConnectionWithTimeout(
 		}
 	}
 
-	select {
-	case res := <-resChan:
-		expired = true
-		return res.resConn, res.resErr
-	}
+	res := <-resChan
+	expired = true
+	return res.resConn, res.resErr
 }
 
 func (tunnel *SSHTunnel) forward(localConn net.Conn) (err error) {
@@ -494,7 +486,7 @@ func (tunnel *SSHTunnel) forward(localConn net.Conn) (err error) {
 			}
 			tunnel.logf("io.Copy [%s] ended without error", copier)
 			endCopy <- true
-			return
+			return //nolint
 		}()
 		select {
 		case <-endCopy:
@@ -515,7 +507,7 @@ func (tunnel *SSHTunnel) Close() {
 	if tunnel.isOpen {
 		tunnel.closer <- struct{}{}
 	}
-	return
+	return //nolint
 }
 
 func NewSSHTunnelFromCfg(gw SSHJump, target Endpoint, local Entrypoint, options ...Option) (_ *SSHTunnel, err error) {
@@ -562,7 +554,7 @@ func NewSSHTunnelWithLocalBinding(
 		return nil, fmt.Errorf("error creating remote endpoint: %w", err)
 	}
 
-	ttlCfg := NewDefaultKeepAliveCfg()
+	ttlCfg := newDefaultKeepAliveCfg()
 	tid, err := uuid.NewV4()
 	if err != nil {
 		err = convertErrorToTunnelError(err)
@@ -593,9 +585,11 @@ func NewSSHTunnelWithLocalBinding(
 	}
 
 	for _, op := range options {
-		err = op(sshTunnel)
-		if err != nil {
-			return nil, err
+		if op != nil {
+			err = op(sshTunnel)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

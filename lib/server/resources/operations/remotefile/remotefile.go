@@ -88,7 +88,7 @@ func (rfc Item) Upload(task concurrency.Task, host resources.Host) (xerr fail.Er
 		temporal.GetLongOperationTimeout(),
 	)
 	if retryErr != nil {
-		switch realErr := retryErr.(type) { // nolint
+		switch realErr := retryErr.(type) { //nolint
 		case *retry.ErrStopRetry:
 			return fail.Wrap(realErr.Cause(), "failed to copy file to remote host '%s'", host.GetName())
 		case *retry.ErrTimeout:

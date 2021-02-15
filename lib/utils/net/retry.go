@@ -64,7 +64,7 @@ func WhileCommunicationUnsuccessful(callback func() error, waitor *retry.Officer
 			// if v != verdict.Done {
 			// 	spew.Dump(v)
 			// }
-			switch v {
+			switch v { //nolint
 			case verdict.Retry:
 				logrus.Warningf("communication failed (%s), retrying", t.Err.Error())
 			}
@@ -110,7 +110,7 @@ func normalizeError(in error) (err error) {
 			return normalizeURLError(realErr)
 		case fail.Error: // a fail.Error may contain a cause of type *url.Error; it's the way used to propagate an *url.Error received by drivers.
 			// In this case, normalize this url.Error accordingly
-			switch cause := realErr.Cause().(type) {
+			switch cause := realErr.Cause().(type) { //nolint
 			case *url.Error:
 				return normalizeURLError(cause)
 			}
@@ -119,9 +119,9 @@ func normalizeError(in error) (err error) {
 			// VPL: this part is here to workaround limitations of Stow in error handling... Should be replaced/removed when Stow will be replaced... one day...
 			str := in.Error()
 			switch str {
-			case "not found":   // stow may return that error message if it does not find something
+			case "not found": // stow may return that error message if it does not find something
 				return fail.NotFoundError("not found")
-			default:    // stow may return an error containing "dial tcp:" for some HTTP errors
+			default: // stow may return an error containing "dial tcp:" for some HTTP errors
 				if strings.Contains(str, "dial tcp:") {
 					return fail.NotAvailableError(str)
 				}

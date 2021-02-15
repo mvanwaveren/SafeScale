@@ -61,12 +61,12 @@ type ServiceTester struct {
 func (tester *ServiceTester) VerifyStacks(t *testing.T) {
 	var stack api.Stack
 
-	stack = aws.NullStack()         // nolint
-	stack = gcp.NullStack()         // nolint
-	stack = huaweicloud.NullStack() // nolint
-	stack = libvirt.NullStack()     // nolint
-	stack = openstack.NullStack()   // nolint
-	stack = outscale.NullStack()    // nolint
+	stack = aws.NullStack()         //nolint
+	stack = gcp.NullStack()         //nolint
+	stack = huaweicloud.NullStack() //nolint
+	stack = libvirt.NullStack()     //nolint
+	stack = openstack.NullStack()   //nolint
+	stack = outscale.NullStack()    //nolint
 
 	_ = stack
 }

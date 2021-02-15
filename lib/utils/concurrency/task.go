@@ -152,7 +152,7 @@ func NewTask() (Task, fail.Error) {
 
 // NewUnbreakableTask is a new task that cannot be aborted by default (but this can be changed with IgnoreAbortSignal(false))
 func NewUnbreakableTask() (Task, fail.Error) {
-	nt, err := newTask(context.Background(), nil) // nolint
+	nt, err := newTask(context.Background(), nil) //nolint
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (t *task) IsNull() bool {
 	return t == nil || t.id == ""
 }
 
-func (t *task) GetLastError() (error, fail.Error) {
+func (t *task) GetLastError() (error, fail.Error) { //nolint
 	if t.IsNull() {
 		return nil, fail.InvalidInstanceError()
 	}
@@ -376,8 +376,8 @@ func (t *task) StartInSubtask(action TaskAction, params TaskParameters) (Task, f
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	subtaskId, _ := st.GetID()
-	t.subtasks[subtaskId] = st
+	subtaskID, _ := st.GetID()
+	t.subtasks[subtaskID] = st
 
 	return st.Start(action, params)
 }
@@ -672,10 +672,8 @@ func (t *task) WaitFor(duration time.Duration) (bool, TaskResult, fail.Error) {
 		}
 	}
 
-	select {
-	case <-c:
-		return true, result, err
-	}
+	<-c
+	return true, result, err
 }
 
 // Abort aborts the task execution if running and marks it as ABORTED unless it's already DONE

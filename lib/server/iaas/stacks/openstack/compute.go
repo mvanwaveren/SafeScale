@@ -488,7 +488,7 @@ func (s Stack) complementHost(hostCore *abstract.HostCore, server servers.Server
 
 	host.Sizing = s.toHostSize(server.Flavor)
 
-	if len(hostNets) >= 0 {
+	if len(hostNets) > 0 {
 		if len(hostPorts) != len(hostNets) {
 			return nil, fail.InconsistentError("count of host ports must be equal to the count of host subnets")
 		}
@@ -665,7 +665,7 @@ func (s Stack) CreateHost(request abstract.HostRequest) (host *abstract.HostFull
 	}
 
 	srvOpts := servers.CreateOpts{
-		Name: request.ResourceName,
+		Name:             request.ResourceName,
 		Networks:         hostNets,
 		FlavorRef:        request.TemplateID,
 		ImageRef:         request.ImageID,
@@ -1281,7 +1281,7 @@ func (s Stack) DeleteHost(hostParam stacks.HostParameter) fail.Error {
 						},
 						NormalizeError,
 					)
-					switch commErr.(type) {
+					switch commErr.(type) { //nolint
 					case *fail.ErrNotFound:
 						return nil
 					}

@@ -264,7 +264,6 @@ func (s stack) CreateHost(request abstract.HostRequest) (host *abstract.HostFull
 	defer debug.NewTracer(nil, tracing.ShouldTrace("stack.compute"), "(%s)", request.ResourceName).WithStopwatch().Entering().Exiting()
 	defer fail.OnPanic(&xerr)
 
-
 	// msgFail := "failed to create Host resource: %s"
 	msgSuccess := fmt.Sprintf("Host resource '%s' created successfully", request.ResourceName)
 
@@ -327,7 +326,7 @@ func (s stack) CreateHost(request abstract.HostRequest) (host *abstract.HostFull
 
 	if template.DiskSize == 0 {
 		// Determines appropriate disk size
-		if template.Cores < 16 { // nolint
+		if template.Cores < 16 { //nolint
 			template.DiskSize = 100
 		} else if template.Cores < 32 {
 			template.DiskSize = 200
@@ -888,7 +887,7 @@ func (s stack) DeleteHost(hostParam stacks.HostParameter) fail.Error {
 							return fail.NewError("host '%s' state is '%s'", host.Name, host.Status)
 						}
 						// FIXME: capture more error types
-						switch commRetryErr.(type) { // nolint
+						switch commRetryErr.(type) { //nolint
 						case *fail.ErrNotFound:
 							resourcePresent = false
 							return nil

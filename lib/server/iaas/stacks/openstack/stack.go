@@ -56,7 +56,7 @@ type Stack struct {
 }
 
 // NullStack returns a null value of the stack
-func NullStack() *Stack {
+func NullStack() *Stack { //nolint
 	return &Stack{}
 }
 
@@ -219,17 +219,15 @@ func New(auth stacks.AuthenticationOptions, authScope *gophercloud.AuthScope, cf
 		default:
 			return nil, xerr
 		}
-	} else {
-		if len(validRegions) != 0 {
-			regionIsValidInput := false
-			for _, vr := range validRegions {
-				if auth.Region == vr {
-					regionIsValidInput = true
-				}
+	} else if len(validRegions) != 0 {
+		regionIsValidInput := false
+		for _, vr := range validRegions {
+			if auth.Region == vr {
+				regionIsValidInput = true
 			}
-			if !regionIsValidInput {
-				return nil, fail.InvalidRequestError("invalid Region '%s'", auth.Region)
-			}
+		}
+		if !regionIsValidInput {
+			return nil, fail.InvalidRequestError("invalid Region '%s'", auth.Region)
 		}
 	}
 
@@ -241,21 +239,19 @@ func New(auth stacks.AuthenticationOptions, authScope *gophercloud.AuthScope, cf
 		default:
 			return nil, xerr
 		}
-	} else {
-		if len(validAvailabilityZones) != 0 {
-			var validZones []string
-			zoneIsValidInput := false
-			for az, valid := range validAvailabilityZones {
-				if valid {
-					if az == auth.AvailabilityZone {
-						zoneIsValidInput = true
-					}
-					validZones = append(validZones, `'`+az+`'`)
+	} else if len(validAvailabilityZones) != 0 {
+		var validZones []string
+		zoneIsValidInput := false
+		for az, valid := range validAvailabilityZones {
+			if valid {
+				if az == auth.AvailabilityZone {
+					zoneIsValidInput = true
 				}
+				validZones = append(validZones, `'`+az+`'`)
 			}
-			if !zoneIsValidInput {
-				return nil, fail.InvalidRequestError("invalid Availability zone '%s', valid zones are %s", auth.AvailabilityZone, strings.Join(validZones, ","))
-			}
+		}
+		if !zoneIsValidInput {
+			return nil, fail.InvalidRequestError("invalid Availability zone '%s', valid zones are %s", auth.AvailabilityZone, strings.Join(validZones, ","))
 		}
 	}
 

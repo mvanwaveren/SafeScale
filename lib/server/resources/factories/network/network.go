@@ -49,6 +49,11 @@ func List(task concurrency.Task, svc iaas.Service) ([]*abstract.Network, fail.Er
 		list = append(list, an)
 		return nil
 	})
+
+	if xerr != nil {
+		return list, xerr
+	}
+
 	return list, nil
 }
 
