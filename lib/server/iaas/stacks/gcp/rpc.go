@@ -51,7 +51,7 @@ func refreshResult(oco opContext) (res result, xerr fail.Error) {
 	var err error
 	res = result{}
 	if oco.Operation != nil {
-		if oco.Operation.Zone != "" { // nolint
+		if oco.Operation.Zone != "" { //nolint
 			zoneURL, ierr := url.Parse(oco.Operation.Zone)
 			if ierr != nil {
 				return res, fail.ToError(ierr)

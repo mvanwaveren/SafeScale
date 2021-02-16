@@ -1352,7 +1352,7 @@ func (c *cluster) Serialize(task concurrency.Task) (_ []byte, xerr fail.Error) {
 	c.SafeRLock(task)
 	defer c.SafeRUnlock(task)
 
-	r, err := json.Marshal(c) // nolint
+	r, err := json.Marshal(c) //nolint
 	return r, fail.ToError(err)
 }
 
@@ -1373,7 +1373,7 @@ func (c *cluster) Deserialize(task concurrency.Task, buf []byte) (xerr fail.Erro
 	c.SafeLock(task)
 	defer c.SafeUnlock(task)
 
-	err := json.Unmarshal(buf, c) // nolint
+	err := json.Unmarshal(buf, c) //nolint
 	return fail.ToError(err)
 }
 

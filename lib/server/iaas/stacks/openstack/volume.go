@@ -290,7 +290,7 @@ func (s Stack) DeleteVolume(id string) (xerr fail.Error) {
 				},
 				NormalizeError,
 			)
-			switch innerXErr.(type) {
+			switch innerXErr.(type) { //nolint
 			case *fail.ErrInvalidRequest:
 				return fail.NotAvailableError("volume not in state 'available'")
 			case *fail.ErrNotFound:

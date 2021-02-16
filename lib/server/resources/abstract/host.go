@@ -173,7 +173,6 @@ type HostRequest struct {
 	KeepOnFailure    bool                // KeepOnFailure tells if resource must be kept on failure
 	Preemptible      bool                // Use spot-like instance
 	SecurityGroupIDs map[string]struct{} // List of Security Groups to attach to IPAddress (using map as dict)
-
 }
 
 // HostEffectiveSizing ...

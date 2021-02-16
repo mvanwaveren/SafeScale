@@ -210,7 +210,7 @@ func kubernetesFeature() *feature {
 }
 
 // // nexusFeature ...
-// func nexusFeature() *feature { // nolint
+// func nexusFeature() *feature { //nolint
 // 	name := "nexus3"
 // 	filename, specs, err := loadSpecFile(name)
 // 	if err != nil {

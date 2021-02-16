@@ -1317,7 +1317,7 @@ func (s stack) BindSecurityGroupToHost(sgParam stacks.SecurityGroupParameter, ho
 			return xerr
 		}
 	}
-	asg, _, xerr := stacks.ValidateSecurityGroupParameter(sgParam) // nolint
+	asg, _, xerr := stacks.ValidateSecurityGroupParameter(sgParam) //nolint
 	if xerr != nil {
 		return xerr
 	}
@@ -1372,7 +1372,7 @@ func (s stack) UnbindSecurityGroupFromHost(sgParam stacks.SecurityGroupParameter
 			return xerr
 		}
 	}
-	asg, _, xerr := stacks.ValidateSecurityGroupParameter(sgParam) // nolint
+	asg, _, xerr := stacks.ValidateSecurityGroupParameter(sgParam) //nolint
 	if !asg.IsComplete() {
 		asg, xerr = s.InspectSecurityGroup(asg)
 		if xerr != nil {

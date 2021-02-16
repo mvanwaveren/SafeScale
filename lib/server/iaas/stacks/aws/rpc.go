@@ -742,7 +742,7 @@ func (s stack) rpcAuthorizeSecurityGroupEgress(id *string, egress []*ec2.IpPermi
 	)
 }
 
-func (s stack) rpcDisassociateAddress(id *string) fail.Error { // nolint
+func (s stack) rpcDisassociateAddress(id *string) fail.Error { //nolint
 	if xerr := validateAWSString(id, "id", true); xerr != nil {
 		return xerr
 	}

@@ -282,7 +282,7 @@ func (s ssh) Copy(from, to string, connectionTimeout, executionTimeout time.Dura
 		connectionTimeout,
 	)
 	if retryErr != nil {
-		switch cErr := retryErr.(type) { // nolint
+		switch cErr := retryErr.(type) { //nolint
 		case *retry.ErrTimeout:
 			return -1, "", "", cErr
 		}
