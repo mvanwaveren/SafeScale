@@ -5,9 +5,6 @@ ndef = $(if $(value $(1)),,$(error $(1) not set))
 .PHONY: default
 default: help ;
 
-#ROOTDIR:=$(shell ROOTDIR='$(ROOTDIR)' bash -c "dirname $(realpath $(lastword $(MAKEFILE_LIST)))")
-#export ROOTDIR
-
 include ./common.mk
 
 # Binaries generated
@@ -36,7 +33,6 @@ LINTER := golang.org/x/lint/golint
 ERRCHECK := github.com/kisielk/errcheck
 XUNIT := github.com/tebeka/go2xunit
 COVERTOOL := github.com/dlespiau/covertool
-GOVENDOR := github.com/kardianos/govendor
 
 BUILD_TAGS =
 export BUILD_TAGS
@@ -47,7 +43,7 @@ all: begin ground getdevdeps sdk generate lib cli err vet
 common: begin ground getdevdeps sdk generate
 
 versioncut:
-	@(($(GO) version | grep go1.15) || ($(GO) version | grep go1.14)) || (printf "%b" "$(ERROR_COLOR)$(ERROR_STRING) Minimum go version is 1.14 ! $(NO_COLOR)\n" && false);
+	@(($(GO) version | grep go1.15) || ($(GO) version | grep go1.14)) || (printf "%b" "$(ERROR_COLOR)$(ERROR_STRING) Minimum go version is 1.14 ! $(NO_COLOR)\n" && /bin/false);
 
 begin: versioncut
 	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Build begins...$(NO_COLOR)\n";
@@ -74,28 +70,34 @@ ground:
 	@command -v $(GO) >/dev/null 2>&1 || { printf "%b" "$(ERROR_COLOR)$(ERROR_STRING) go is required but it's not installed.  Aborting.$(NO_COLOR)\n" >&2; exit 1; }
 	@command -v protoc >/dev/null 2>&1 || { printf "%b" "$(ERROR_COLOR)$(ERROR_STRING) protoc is required but it's not installed.  Aborting.$(NO_COLOR)\n" >&2; exit 1; }
 
-getdevdeps: begin ground
-	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Testing prerequisites, $(NO_COLOR)target $(OBJ_COLOR)$(@)$(NO_COLOR)\n";
-	@which rice go2xunit cover covertool govendor > /dev/null; if [ $$? -ne 0 ]; then \
-    	$(GO) get -u $(RICE) $(COVER) $(XUNIT) $(GOVENDOR) $(COVERTOOL) &>/dev/null || true; \
-    fi
+buildreq: begin ground
+	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Testing minimum prerequisites, $(NO_COLOR)target $(OBJ_COLOR)$(@)$(NO_COLOR)\n";
 	@which protoc-gen-go > /dev/null; if [ $$? -ne 0 ]; then \
 		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading protoc-gen-go...\n" && $(GO) get github.com/golang/protobuf/protoc-gen-go@v1.3.2 &>/dev/null || true; \
 	fi
-	@which mockgen > /dev/null; if [ $$? -ne 0 ]; then \
-		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading mockgen...\n" && $(GO) get -u  $(MOCKGEN) &>/dev/null || true; \
+	@which rice > /dev/null; if [ $$? -ne 0 ]; then \
+		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading rice...\n" && $(GO) get -u $(RICE) &>/dev/null || true; \
+	fi
+	@which stringer > /dev/null; if [ $$? -ne 0 ]; then \
+		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading stringer...\n" && $(GO) get -u  $(STRINGER) &>/dev/null || true; \
 	fi
 	@which errcheck > /dev/null; if [ $$? -ne 0 ]; then \
 		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading errcheck...\n" && $(GO) get -u  $(ERRCHECK) &>/dev/null || true; \
+	fi
+
+getdevdeps: begin ground buildreq
+	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Testing prerequisites, $(NO_COLOR)target $(OBJ_COLOR)$(@)$(NO_COLOR)\n";
+	@which go2xunit cover covertool > /dev/null; if [ $$? -ne 0 ]; then \
+    	$(GO) get -u $(COVER) $(XUNIT) $(COVERTOOL) &>/dev/null || true; \
+    fi
+	@which mockgen > /dev/null; if [ $$? -ne 0 ]; then \
+		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading mockgen...\n" && $(GO) get -u  $(MOCKGEN) &>/dev/null || true; \
 	fi
 	@which goconvey > /dev/null; if [ $$? -ne 0 ]; then \
 		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading convey...\n" && $(GO) get -u  $(CONVEY) &>/dev/null || true; \
 	fi
 	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
 		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading linter...\n" && $(GO) get -u  $(LINTER) &>/dev/null || true; \
-	fi
-	@which stringer > /dev/null; if [ $$? -ne 0 ]; then \
-		printf "%b" "$(OK_COLOR)$(INFO_STRING) Downloading stringer...\n" && $(GO) get -u  $(STRINGER) &>/dev/null || true; \
 	fi
 	@which golangci-lint > /dev/null; if [ $$? -ne 0 ]; then \
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell $(GO) env GOPATH)/bin v1.26.0 || true; \
@@ -167,7 +169,7 @@ gofmt: begin
 	@if [ -n "$$($(GOFMT) -d $(PKG_FILES))" ]; then \
 		"$$($(GOFMT) -d $(PKG_FILES))" \
 		echo "-- gofmt check failed"; \
-		false; \
+		/bin/false; \
 	fi
 
 err: begin generate
@@ -193,7 +195,7 @@ metalint: begin generate
 
 style: begin generate gofmt
 	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Running style checks, $(NO_COLOR)target $(OBJ_COLOR)$(@)$(NO_COLOR)\n";
-	@(which golangci-lint > /dev/null && golangci-lint --color never --disable-all --enable=errcheck --enable=stylecheck --enable=deadcode --enable=golint --enable=gocritic --enable=staticcheck --enable=gosimple --enable=govet --enable=ineffassign --enable=varcheck run ./... || true) || echo "golangci-lint not installed in your system"
+	@(which golangci-lint > /dev/null && golangci-lint --color never --disable-all --enable=errcheck --enable=stylecheck --enable=deadcode --enable=golint --enable=gocritic --enable=staticcheck --enable=gosimple --enable=govet --enable=ineffassign --enable=varcheck run ${PKG_LIST_ALT} || true) || echo "golangci-lint not installed in your system"
 
 coverage: begin generate
 	@printf "%b" "$(OK_COLOR)$(INFO_STRING) Collecting coverage data, $(NO_COLOR)target $(OBJ_COLOR)$(@)$(NO_COLOR)\n";

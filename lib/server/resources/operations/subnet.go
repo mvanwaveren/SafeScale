@@ -222,7 +222,7 @@ func LoadSubnet(task concurrency.Task, svc iaas.Service, networkRef, subnetRef s
 				return nil, xerr
 			}
 		}
-		if rn != nil {
+		if rn != nil { //nolint
 			// Network metadata loaded, find the ID of the Subnet (subnetRef may be ID or Name)
 			xerr = rn.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 				return props.Inspect(task, networkproperty.SubnetsV1, func(clonable data.Clonable) fail.Error {
@@ -614,7 +614,7 @@ func (rs *subnet) Create(task concurrency.Task, req abstract.SubnetRequest, gwna
 		ImageID: img.ID,
 		Subnets: []*abstract.Subnet{as},
 		// KeyPair:          keypair,
-		SshPort:          req.DefaultSshPort,
+		SSHPort:          req.DefaultSSHPort,
 		TemplateID:       template.ID,
 		KeepOnFailure:    req.KeepOnFailure,
 		SecurityGroupIDs: sgs,
@@ -946,7 +946,7 @@ func (rs subnet) validateNetwork(task concurrency.Task, req *abstract.SubnetRequ
 		})
 	} else {
 		rn = nil
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *fail.ErrNotFound:
 			if !svc.HasDefaultNetwork() {
 				return nil, nil, xerr
@@ -1735,14 +1735,12 @@ func (rs *subnet) unbindSecurityGroups(task concurrency.Task, sgs *propertiesv1.
 			default:
 				return xerr
 			}
-		} else {
-			if xerr = rsg.Delete(task); xerr != nil {
-				switch xerr.(type) {
-				case *fail.ErrNotFound:
-					// Consider a Security Group not found as a successful deletion and continue
-				default:
-					return xerr
-				}
+		} else if xerr = rsg.Delete(task); xerr != nil {
+			switch xerr.(type) {
+			case *fail.ErrNotFound:
+				// Consider a Security Group not found as a successful deletion and continue
+			default:
+				return xerr
 			}
 		}
 		delete(sgs.ByID, v)

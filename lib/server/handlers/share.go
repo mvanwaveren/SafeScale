@@ -17,7 +17,6 @@
 package handlers
 
 import (
-	"path"
 	"reflect"
 
 	"github.com/CS-SI/SafeScale/lib/server"
@@ -57,6 +56,7 @@ func NewShareHandler(job server.Job) ShareHandler {
 	return &shareHandler{job: job}
 }
 
+/*
 func sanitize(in string) (string, fail.Error) {
 	sanitized := path.Clean(in)
 	if !path.IsAbs(sanitized) {
@@ -64,6 +64,7 @@ func sanitize(in string) (string, fail.Error) {
 	}
 	return sanitized, nil
 }
+*/
 
 // Create a share on host
 func (handler *shareHandler) Create(
@@ -476,11 +477,10 @@ func (handler *shareHandler) Unmount(shareRef, hostRef string) (xerr fail.Error)
 	var target resources.Host
 	if server.GetName() == hostRef || server.GetID() == hostRef {
 		target = server
-	} else {
-		if target, xerr = hostfactory.Load(task, handler.job.GetService(), hostRef); xerr != nil {
-			return xerr
-		}
+	} else if target, xerr = hostfactory.Load(task, handler.job.GetService(), hostRef); xerr != nil {
+		return xerr
 	}
+
 	return objs.Unmount(task, target)
 	//
 	// var shareID, sharePath string

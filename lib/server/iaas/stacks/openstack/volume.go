@@ -301,7 +301,7 @@ func (s Stack) DeleteVolume(id string) (xerr fail.Error) {
 		timeout,
 	)
 	if xerr != nil {
-		switch xerr.(type) {
+		switch xerr.(type) { //nolint
 		case *retry.ErrStopRetry:
 			if xerr.Cause() != nil {
 				xerr = fail.ToError(xerr.Cause())

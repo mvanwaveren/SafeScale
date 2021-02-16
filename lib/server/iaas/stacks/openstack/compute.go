@@ -493,7 +493,7 @@ func (s Stack) complementHost(hostCore *abstract.HostCore, server servers.Server
 
 	host.Sizing = s.toHostSize(server.Flavor)
 
-	if len(hostNets) >= 0 {
+	if len(hostNets) > 0 {
 		if len(hostPorts) != len(hostNets) {
 			return nil, fail.InconsistentError("count of host ports must be equal to the count of host subnets")
 		}
@@ -723,7 +723,7 @@ func (s Stack) CreateHost(request abstract.HostRequest) (host *abstract.HostFull
 					if derr := s.rpcDeleteServer(server.ID); derr != nil {
 						logrus.Debugf(derr.Error())
 						_ = innerXErr.AddConsequence(fail.Wrap(derr, "cleaning up on failure, failed to delete host '%s'", request.ResourceName))
-						switch derr.(type) {
+						switch derr.(type) { //nolint
 						case *fail.ErrNotAvailable: // If host is not available (ie in error state), stop retries, something is wrong on provider side
 							xerr = retry.StopRetryError(innerXErr)
 						}
@@ -1273,7 +1273,7 @@ func (s Stack) DeleteHost(hostParam stacks.HostParameter) fail.Error {
 						},
 						NormalizeError,
 					)
-					switch commErr.(type) {
+					switch commErr.(type) { //nolint
 					case *fail.ErrNotFound:
 						return nil
 					}
