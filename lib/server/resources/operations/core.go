@@ -491,7 +491,7 @@ func (c *core) write(task concurrency.Task) fail.Error {
 	return nil
 }
 
-// Reload reloads the content of the Object Storage, overriding what is in the metadata instance
+// Reload reloads the content from the Object Storage
 func (c *core) Reload(task concurrency.Task) (xerr fail.Error) {
 	defer fail.OnPanic(&xerr)
 
@@ -501,6 +501,9 @@ func (c *core) Reload(task concurrency.Task) (xerr fail.Error) {
 	if task == nil {
 		return fail.InvalidParameterError("task", "cannot be nil")
 	}
+
+	c.SafeLock(task)
+	defer c.SafeUnlock(task)
 
 	if c.loaded && !c.committed {
 		return fail.InconsistentError("altered and not committed")
