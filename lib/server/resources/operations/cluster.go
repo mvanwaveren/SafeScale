@@ -2273,7 +2273,7 @@ func (c cluster) ListMasters(task concurrency.Task) (list resources.IndexedListO
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(clonable data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(clonable data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) (innerXErr fail.Error) {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2320,7 +2320,7 @@ func (c cluster) ListMasterNames(task concurrency.Task) (list data.IndexedListOf
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2366,7 +2366,7 @@ func (c cluster) ListMasterIDs(task concurrency.Task) (list data.IndexedListOfSt
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2412,7 +2412,7 @@ func (c *cluster) ListMasterIPs(task concurrency.Task) (list data.IndexedListOfS
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) (innerXErr fail.Error) {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2518,7 +2518,7 @@ func (c cluster) ListNodes(task concurrency.Task) (list resources.IndexedListOfC
 		return nil, fail.AbortedError(nil, "aborted")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2568,7 +2568,7 @@ func (c cluster) ListNodeNames(task concurrency.Task) (list data.IndexedListOfSt
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2615,7 +2615,7 @@ func (c cluster) ListNodeIDs(task concurrency.Task) (list data.IndexedListOfStri
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
@@ -2662,7 +2662,7 @@ func (c cluster) ListNodeIPs(task concurrency.Task) (list data.IndexedListOfStri
 		return nil, fail.NotAvailableError("cluster is being removed")
 	}
 
-	xerr = c.Inspect(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
+	xerr = c.Review(task, func(_ data.Clonable, props *serialize.JSONProperties) fail.Error {
 		return props.Inspect(task, clusterproperty.NodesV3, func(clonable data.Clonable) fail.Error {
 			nodesV3, ok := clonable.(*propertiesv3.ClusterNodes)
 			if !ok {
